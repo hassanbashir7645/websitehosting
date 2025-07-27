@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR System - A2Hosting Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .btn { background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block; margin: 10px 5px 0 0; }
+        h1 { color: #333; }
+        .file-check { margin: 10px 0; padding: 10px; background: white; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Meeting Matters HR - A2Hosting Diagnostic</h1>
+    
+    <div class="status success">
+        <strong>✓ SUCCESS:</strong> This HTML file is loading correctly on A2Hosting!
+        <br>Domain: hr.themeetingmatters.com
+        <br>Date: <span id="current-date"></span>
+    </div>
+
+    <div class="status info">
+        <strong>Server Information:</strong>
+        <br>User Agent: <span id="user-agent"></span>
+        <br>Current URL: <span id="current-url"></span>
+    </div>
+
+    <h2>File Access Tests</h2>
+    
+    <div class="file-check">
+        <strong>CSS File Test:</strong> <span id="css-result">Testing...</span>
+        <br><small>assets/index-BsylCeS7.css</small>
+    </div>
+    
+    <div class="file-check">
+        <strong>JavaScript File Test:</strong> <span id="js-result">Testing...</span>
+        <br><small>assets/index-DYiNjWux.js</small>
+    </div>
+
+    <div class="file-check">
+        <strong>Directory Test:</strong> <span id="dir-result">Testing...</span>
+        <br><small>assets/ folder access</small>
+    </div>
+
+    <h2>Next Steps</h2>
+    <div id="next-steps" class="status info">
+        Checking files... Please wait.
+    </div>
+
+    <div>
+        <a href="#" class="btn" onclick="location.reload()">Refresh Test</a>
+        <a href="hr-app.html" class="btn">Try HR App</a>
+    </div>
+
+    <script>
+        // Display current info
+        document.getElementById('current-date').textContent = new Date().toString();
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('current-url').textContent = window.location.href;
+
+        // Test CSS file
+        fetch('assets/index-BsylCeS7.css')
+            .then(response => {
+                const result = response.ok ? 
+                    '<span style="color: green;">✓ CSS file accessible</span>' : 
+                    '<span style="color: red;">✗ CSS file not found (Status: ' + response.status + ')</span>';
+                document.getElementById('css-result').innerHTML = result;
+                return response.ok;
+            })
+            .catch(error => {
+                document.getElementById('css-result').innerHTML = '<span style="color: red;">✗ CSS file error: ' + error.message + '</span>';
+                return false;
+            });
+
+        // Test JS file
+        fetch('assets/index-DYiNjWux.js')
+            .then(response => {
+                const result = response.ok ? 
+                    '<span style="color: green;">✓ JS file accessible</span>' : 
+                    '<span style="color: red;">✗ JS file not found (Status: ' + response.status + ')</span>';
+                document.getElementById('js-result').innerHTML = result;
+                return response.ok;
+            })
+            .catch(error => {
+                document.getElementById('js-result').innerHTML = '<span style="color: red;">✗ JS file error: ' + error.message + '</span>';
+                return false;
+            });
+
+        // Test directory (this often fails on shared hosting, but that's normal)
+        fetch('assets/')
+            .then(response => {
+                const result = response.ok ? 
+                    '<span style="color: green;">✓ Directory accessible</span>' : 
+                    '<span style="color: orange;">⚠ Directory not browsable (normal for shared hosting)</span>';
+                document.getElementById('dir-result').innerHTML = result;
+            })
+            .catch(error => {
+                document.getElementById('dir-result').innerHTML = '<span style="color: orange;">⚠ Directory not browsable (normal)</span>';
+            });
+
+        // Update next steps after tests
+        setTimeout(function() {
+            document.getElementById('next-steps').innerHTML = 
+                '<strong>Diagnosis:</strong> If CSS and JS show green checkmarks, your HR app should work. ' +
+                'Directory warnings are normal for shared hosting. Click "Try HR App" to test the full system.';
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Meeting Matters HR Management System</title>
+    <meta name="description" content="Comprehensive HR management platform for Meeting Matters organization" />
+    <link rel="stylesheet" href="assets/index-BsylCeS7.css">
+    <style>
+      /* Loading indicator */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+      }
+      .loading-screen.hidden {
+        display: none;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007cba;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .error-screen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #f8f9fa;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      .error-screen.show {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+      <div class="spinner"></div>
+      <div>Loading HR Management System...</div>
+      <div style="font-size: 14px; color: #666; margin-top: 10px;">This may take a few seconds</div>
+    </div>
+
+    <!-- Error Screen -->
+    <div class="error-screen" id="error-screen">
+      <h2 style="color: #dc3545;">HR System Loading Error</h2>
+      <p>The HR management system couldn't load properly.</p>
+      <p><strong>Possible causes:</strong></p>
+      <ul style="text-align: left; max-width: 400px;">
+        <li>CSS or JavaScript files are missing</li>
+        <li>File permissions need adjustment (644 for files, 755 for folders)</li>
+        <li>Assets folder not uploaded correctly</li>
+      </ul>
+      <div style="margin-top: 20px;">
+        <a href="index.html" style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; margin-right: 10px;">Back to Diagnostic</a>
+        <button onclick="location.reload()" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 3px;">Retry</button>
+      </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="root"></div>
+
+    <script>
+      // Error handling
+      let loadTimeout;
+      let hasLoaded = false;
+
+      // Set a timeout to show error if nothing loads in 10 seconds
+      loadTimeout = setTimeout(function() {
+        if (!hasLoaded) {
+          document.getElementById('loading-screen').classList.add('hidden');
+          document.getElementById('error-screen').classList.add('show');
+        }
+      }, 10000);
+
+      // Listen for successful app load
+      window.addEventListener('DOMContentLoaded', function() {
+        // Check if React app has started loading
+        setTimeout(function() {
+          const root = document.getElementById('root');
+          if (root && root.innerHTML.trim() !== '') {
+            hasLoaded = true;
+            clearTimeout(loadTimeout);
+            document.getElementById('loading-screen').classList.add('hidden');
+          }
+        }, 5000);
+      });
+
+      // Global error handler
+      window.addEventListener('error', function(e) {
+        console.error('Loading error:', e.error);
+        if (!hasLoaded) {
+          clearTimeout(loadTimeout);
+          document.getElementById('loading-screen').classList.add('hidden');
+          document.getElementById('error-screen').classList.add('show');
+        }
+      });
+    </script>
+    
+    <!-- Load the main HR application -->
+    <script type="module" src="assets/index-DYiNjWux.js"></script>
+  </body>
+</html>

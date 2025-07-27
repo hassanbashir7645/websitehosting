@@ -1,0 +1,29 @@
+# A2Hosting 403 Error Fix
+RewriteEngine On
+
+# Fix directory permissions
+Options +FollowSymLinks -Indexes
+
+# Set default index file
+DirectoryIndex index.html
+
+# Handle client-side routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [L,QSA]
+
+# MIME types for proper file serving
+AddType text/html .html
+AddType text/css .css
+AddType application/javascript .js
+
+# File permissions fix
+<Files "index.html">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<FilesMatch "\.(css|js)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
