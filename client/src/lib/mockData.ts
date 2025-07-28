@@ -1,10 +1,10 @@
-// Mock data for standalone deployment
+// Mock data for psychometric testing platform
 export const DEMO_MODE = true;
 
 export const mockUsers = [
   {
-    id: "demo_hr_admin",
-    email: "hr.admin@meetingmatters.com",
+    id: "demo_admin",
+    email: "admin@psychotestpro.com",
     firstName: "Sarah",
     lastName: "Wilson",
     profileImageUrl: null,
@@ -13,8 +13,8 @@ export const mockUsers = [
     department: "Human Resources",
     position: "HR Administrator",
     managerId: null,
-    startDate: "2024-01-15",
-    createdAt: "2024-01-15T09:00:00.000Z",
+    startDate: "2024-01-01",
+    createdAt: "2024-01-01T09:00:00.000Z",
     updatedAt: "2025-01-01T09:00:00.000Z"
   }
 ];
@@ -22,10 +22,10 @@ export const mockUsers = [
 export const mockEmployees = [
   {
     id: 1,
-    userId: "demo_hr_admin",
-    employeeId: "EMP001",
+    userId: "demo_admin",
+    employeeId: "ADM001",
     phoneNumber: "555-123-4567",
-    address: "123 Main St, Business District, City 12345",
+    address: "123 Admin St, Business District, City 12345",
     emergencyContact: {
       name: "John Wilson",
       phone: "555-987-6543",
@@ -33,16 +33,16 @@ export const mockEmployees = [
     },
     onboardingStatus: "completed",
     onboardingProgress: 100,
-    createdAt: "2024-01-15T09:00:00.000Z",
+    createdAt: "2024-01-01T09:00:00.000Z",
     updatedAt: "2025-01-01T09:00:00.000Z",
     user: mockUsers[0]
   },
   {
     id: 2,
-    userId: "demo_employee_1",
-    employeeId: "EMP002",
+    userId: "demo_recruiter_1",
+    employeeId: "REC001",
     phoneNumber: "555-234-5678",
-    address: "456 Oak Ave, Residential Area, City 12345",
+    address: "456 Oak Ave, Business Area, City 12345",
     emergencyContact: {
       name: "Jane Smith",
       phone: "555-876-5432",
@@ -50,30 +50,30 @@ export const mockEmployees = [
     },
     onboardingStatus: "in_progress",
     onboardingProgress: 75,
-    createdAt: "2024-02-01T09:00:00.000Z",
+    createdAt: "2024-01-15T09:00:00.000Z",
     updatedAt: "2025-01-10T09:00:00.000Z",
     user: {
-      id: "demo_employee_1",
-      email: "john.smith@meetingmatters.com",
+      id: "demo_recruiter_1",
+      email: "john.smith@psychotestpro.com",
       firstName: "John",
       lastName: "Smith",
       profileImageUrl: null,
-      role: "employee",
+      role: "recruiter",
       status: "active",
-      department: "Marketing",
-      position: "Marketing Coordinator",
-      managerId: "demo_hr_admin",
-      startDate: "2024-02-01",
-      createdAt: "2024-02-01T09:00:00.000Z",
+      department: "Human Resources",
+      position: "Senior Recruiter",
+      managerId: "demo_admin",
+      startDate: "2024-01-15",
+      createdAt: "2024-01-15T09:00:00.000Z",
       updatedAt: "2025-01-01T09:00:00.000Z"
     }
   },
   {
     id: 3,
-    userId: "demo_employee_2",
-    employeeId: "EMP003",
+    userId: "demo_hiring_manager_1",
+    employeeId: "HM001",
     phoneNumber: "555-345-6789",
-    address: "789 Pine Rd, Tech Quarter, City 12345",
+    address: "789 Pine Rd, Business Quarter, City 12345",
     emergencyContact: {
       name: "Mike Johnson",
       phone: "555-765-4321",
@@ -81,169 +81,23 @@ export const mockEmployees = [
     },
     onboardingStatus: "pending",
     onboardingProgress: 25,
-    createdAt: "2024-02-15T09:00:00.000Z",
+    createdAt: "2024-02-01T09:00:00.000Z",
     updatedAt: "2025-01-15T09:00:00.000Z",
     user: {
-      id: "demo_employee_2",
-      email: "sarah.johnson@meetingmatters.com",
+      id: "demo_hiring_manager_1",
+      email: "sarah.johnson@psychotestpro.com",
       firstName: "Sarah",
       lastName: "Johnson",
       profileImageUrl: null,
-      role: "employee",
+      role: "hiring_manager",
       status: "active",
-      department: "IT",
-      position: "Software Developer",
-      managerId: "demo_hr_admin",
-      startDate: "2024-02-15",
-      createdAt: "2024-02-15T09:00:00.000Z",
+      department: "Operations",
+      position: "Hiring Manager",
+      managerId: "demo_admin",
+      startDate: "2024-02-01",
+      createdAt: "2024-02-01T09:00:00.000Z",
       updatedAt: "2025-01-01T09:00:00.000Z"
     }
-  }
-];
-
-export const mockTasks = [
-  {
-    id: 1,
-    title: "Complete Employee Handbook Review",
-    description: "Review and update the employee handbook for 2025 compliance requirements",
-    status: "completed",
-    priority: "high",
-    assignedTo: 2,
-    assignedBy: 1,
-    dueDate: "2025-01-10",
-    completedAt: "2025-01-08T14:30:00.000Z",
-    createdAt: "2024-12-15T09:00:00.000Z",
-    assignee: mockEmployees[1].user,
-    assigner: mockEmployees[0].user
-  },
-  {
-    id: 2,
-    title: "Q1 Performance Review Preparation",
-    description: "Prepare performance review documents and schedules for Q1 2025",
-    status: "in_progress",
-    priority: "medium",
-    assignedTo: 3,
-    assignedBy: 1,
-    dueDate: "2025-02-01",
-    completedAt: null,
-    createdAt: "2025-01-01T09:00:00.000Z",
-    assignee: mockEmployees[2].user,
-    assigner: mockEmployees[0].user
-  },
-  {
-    id: 3,
-    title: "Office Safety Training Setup",
-    description: "Coordinate with facilities to set up quarterly safety training sessions",
-    status: "pending",
-    priority: "medium",
-    assignedTo: 2,
-    assignedBy: 1,
-    dueDate: "2025-01-25",
-    completedAt: null,
-    createdAt: "2025-01-10T09:00:00.000Z",
-    assignee: mockEmployees[1].user,
-    assigner: mockEmployees[0].user
-  }
-];
-
-export const mockAnnouncements = [
-  {
-    id: 1,
-    title: "New Employee Wellness Program Launch",
-    content: "We're excited to announce the launch of our comprehensive employee wellness program starting February 1st. This program includes mental health resources, fitness memberships, and flexible work arrangements.",
-    priority: "high",
-    targetRoles: ["employee", "hr_admin", "branch_manager", "team_lead"],
-    createdBy: 1,
-    isActive: true,
-    createdAt: "2025-01-15T09:00:00.000Z",
-    author: mockEmployees[0].user
-  },
-  {
-    id: 2,
-    title: "Office Holiday Schedule Update",
-    content: "Please note the updated holiday schedule for 2025. All national holidays will be observed with paid time off. The office will be closed December 24th-26th and December 31st-January 1st.",
-    priority: "medium",
-    targetRoles: ["employee", "hr_admin", "branch_manager", "team_lead"],
-    createdBy: 1,
-    isActive: true,
-    createdAt: "2025-01-10T10:00:00.000Z",
-    author: mockEmployees[0].user
-  }
-];
-
-export const mockOnboardingChecklists = [
-  {
-    id: 1,
-    employeeId: 2,
-    itemTitle: "Complete I-9 Form",
-    description: "Fill out and submit I-9 employment eligibility verification form",
-    isCompleted: true,
-    dueDate: "2024-02-01",
-    completedAt: "2024-01-30T14:00:00.000Z",
-    order: 1,
-    requiresDocument: true,
-    documentType: "I-9 Form",
-    documentUrl: "/documents/i9-john-smith.pdf",
-    documentName: "I-9-John-Smith.pdf",
-    isDocumentVerified: true,
-    verifiedBy: 1,
-    verifiedAt: "2024-01-31T09:00:00.000Z",
-    verificationNotes: "All documentation verified and compliant"
-  },
-  {
-    id: 2,
-    employeeId: 2,
-    itemTitle: "Attend Welcome Orientation",
-    description: "Participate in new employee welcome orientation session",
-    isCompleted: true,
-    dueDate: "2024-02-02",
-    completedAt: "2024-02-02T10:00:00.000Z",
-    order: 2,
-    requiresDocument: false
-  },
-  {
-    id: 3,
-    employeeId: 2,
-    itemTitle: "IT Equipment Setup",
-    description: "Receive and configure laptop, phone, and necessary software access",
-    isCompleted: false,
-    dueDate: "2024-02-05",
-    completedAt: null,
-    order: 3,
-    requiresDocument: false
-  }
-];
-
-export const mockDashboardStats = {
-  totalEmployees: 3,
-  activeOnboarding: 2,
-  pendingTasks: 2,
-  completedTasks: 1,
-  totalAnnouncements: 2,
-  activeRecognitions: 1
-};
-
-export const mockActivities = [
-  {
-    id: 1,
-    type: "task_completed",
-    description: "John Smith completed 'Employee Handbook Review'",
-    timestamp: "2025-01-08T14:30:00.000Z",
-    user: mockEmployees[1].user
-  },
-  {
-    id: 2,
-    type: "onboarding_progress",
-    description: "Sarah Johnson updated onboarding progress to 25%",
-    timestamp: "2025-01-15T11:20:00.000Z",
-    user: mockEmployees[2].user
-  },
-  {
-    id: 3,
-    type: "announcement_created",
-    description: "New wellness program announcement published",
-    timestamp: "2025-01-15T09:00:00.000Z",
-    user: mockEmployees[0].user
   }
 ];
 
@@ -255,8 +109,8 @@ export const mockPsychometricTests = [
     id: 1,
     testName: "Big Five Personality Assessment",
     testType: "personality",
-    description: "Comprehensive personality assessment based on the Five-Factor Model",
-    instructions: "Please answer each question honestly based on how you typically think, feel, and behave. There are no right or wrong answers.",
+    description: "Comprehensive personality assessment based on the scientifically validated Five-Factor Model",
+    instructions: "Please answer each question honestly based on how you typically think, feel, and behave. There are no right or wrong answers. This assessment takes approximately 25 minutes.",
     timeLimit: 25,
     totalQuestions: 20,
     isActive: true,
@@ -267,8 +121,8 @@ export const mockPsychometricTests = [
     id: 2,
     testName: "Cognitive Aptitude Assessment", 
     testType: "cognitive",
-    description: "Evaluate problem-solving abilities and logical reasoning skills",
-    instructions: "Read each question carefully and select the best answer. You have limited time for each question.",
+    description: "Comprehensive evaluation of problem-solving abilities, logical reasoning, and analytical thinking skills",
+    instructions: "Read each question carefully and select the best answer. You have 20 minutes to complete 15 questions. Work efficiently but accurately.",
     timeLimit: 20,
     totalQuestions: 15,
     isActive: true,
@@ -279,10 +133,22 @@ export const mockPsychometricTests = [
     id: 3,
     testName: "Emotional Intelligence Assessment",
     testType: "emotional_intelligence", 
-    description: "Assess your ability to understand and manage emotions",
-    instructions: "Consider each scenario and choose the response that best reflects how you would typically react.",
+    description: "Comprehensive assessment of emotional intelligence across four key domains: self-awareness, self-management, social awareness, and relationship management",
+    instructions: "Consider each scenario and choose the response that best reflects how you would typically react. This assessment takes approximately 30 minutes.",
     timeLimit: 30,
     totalQuestions: 25,
+    isActive: true,
+    createdBy: 1,
+    createdAt: "2024-12-01T09:00:00.000Z"
+  },
+  {
+    id: 4,
+    testName: "Integrity and Honesty Assessment",
+    testType: "integrity",
+    description: "Scenario-based assessment evaluating ethical decision-making, honesty, and workplace integrity",
+    instructions: "Read each scenario carefully and select the response that best represents what you would actually do in that situation. Be honest in your responses.",
+    timeLimit: 25,
+    totalQuestions: 20,
     isActive: true,
     createdBy: 1,
     createdAt: "2024-12-01T09:00:00.000Z"
@@ -412,6 +278,39 @@ export const mockTestAttempts = [
     testId: 2,
     candidateName: "Maria Garcia",
     candidateEmail: "maria.garcia@example.com", 
+    status: "completed",
+    startedAt: "2025-01-12T14:30:00.000Z",
+    completedAt: "2025-01-12T14:48:00.000Z",
+    percentageScore: 92,
+    responses: {}
+  },
+  {
+    id: 3,
+    testId: 3,
+    candidateName: "David Chen",
+    candidateEmail: "david.chen@example.com",
+    status: "completed",
+    startedAt: "2025-01-14T11:15:00.000Z", 
+    completedAt: "2025-01-14T11:42:00.000Z",
+    percentageScore: 78,
+    responses: {}
+  },
+  {
+    id: 1,
+    testId: 1,
+    candidateName: "Alex Johnson",
+    candidateEmail: "alex.johnson@example.com",
+    status: "completed",
+    startedAt: "2025-01-10T09:00:00.000Z",
+    completedAt: "2025-01-10T09:23:00.000Z",
+    percentageScore: 85,
+    responses: {}
+  },
+  {
+    id: 2,
+    testId: 2,
+    candidateName: "Maria Garcia",
+    candidateEmail: "maria.garcia@example.com", 
     status: "in_progress",
     startedAt: "2025-01-15T14:30:00.000Z",
     completedAt: null,
@@ -420,13 +319,13 @@ export const mockTestAttempts = [
   },
   {
     id: 3,
-    testId: 1,
+    testId: 4,
     candidateName: "David Chen",
     candidateEmail: "david.chen@example.com",
     status: "completed",
     startedAt: "2025-01-12T11:15:00.000Z", 
     completedAt: "2025-01-12T11:38:00.000Z",
-    percentageScore: 92,
+    percentageScore: 88,
     responses: {}
   }
 ];

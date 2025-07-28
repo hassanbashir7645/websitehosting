@@ -2,12 +2,6 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { 
   DEMO_MODE, 
   mockAuthUser, 
-  mockEmployees, 
-  mockTasks, 
-  mockAnnouncements, 
-  mockOnboardingChecklists,
-  mockDashboardStats,
-  mockActivities,
   mockPsychometricTests,
   mockPsychometricQuestions,
   mockTestAttempts
@@ -30,28 +24,12 @@ function getMockResponse(url: string, method: string = 'GET') {
   switch (path.join('/')) {
     case 'api/auth/user':
       return mockAuthUser;
-    case 'api/employees':
-      return mockEmployees;
-    case 'api/tasks':
-      return mockTasks;
-    case 'api/announcements':
-      return mockAnnouncements;
-    case 'api/dashboard/stats':
-      return mockDashboardStats;
-    case 'api/dashboard/activities':
-      return mockActivities;
-    case 'api/dashboard/approvals':
-      return [];
     case 'api/psychometric-tests':
       return mockPsychometricTests;
     case 'api/psychometric-test-attempts':
       return mockTestAttempts;
     default:
       // Handle dynamic routes
-      if (path[0] === 'api' && path[1] === 'onboarding' && path[2]) {
-        const employeeId = parseInt(path[2]);
-        return mockOnboardingChecklists.filter(item => item.employeeId === employeeId);
-      }
       return null;
   }
 }

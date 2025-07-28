@@ -1,136 +1,106 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Clock, 
-  Award, 
-  Download,
-  Calendar,
-  PieChart,
+  Brain,
+  BarChart3,
+  Users,
   Target,
-  CheckCircle
+  Download,
+  TrendingUp,
+  Award
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { Task, Employee, Recognition, LogisticsRequest } from '@/types';
 
 export default function Analytics() {
   const { user } = useAuth();
-  const [timeRange, setTimeRange] = useState('month');
-  const [departmentFilter, setDepartmentFilter] = useState('all');
 
-  const { data: employees, isLoading: employeesLoading } = useQuery({
-    queryKey: ['/api/employees', { department: departmentFilter }],
+  const { data: tests = [], isLoading: testsLoading } = useQuery({
+    queryKey: ['/api/psychometric-tests'],
     retry: false,
   });
 
-  const { data: tasks, isLoading: tasksLoading } = useQuery({
-    queryKey: ['/api/tasks'],
+  const { data: attempts = [], isLoading: attemptsLoading } = useQuery({
+    queryKey: ['/api/psychometric-test-attempts'],
     retry: false,
   });
 
-  const { data: recognitions, isLoading: recognitionsLoading } = useQuery({
-    queryKey: ['/api/recognition'],
-    retry: false,
-  });
-
-  const { data: logisticsRequests, isLoading: logisticsLoading } = useQuery({
-    queryKey: ['/api/logistics/requests'],
-    retry: false,
-  });
-
-  const { data: dashboardStats } = useQuery({
-    queryKey: ['/api/dashboard/stats'],
-    retry: false,
-  });
-
-  const canViewAnalytics = user?.role && ['hr_admin', 'branch_manager'].includes(user.role);
+  const canViewAnalytics = user?.role && ['hr_admin', 'recruiter'].includes(user.role);
 
   if (!canViewAnalytics) {
     return (
       <div className="p-6">
         <Card className="stats-card">
           <CardContent className="p-12 text-center">
-            <BarChart3 className="mx-auto mb-4 text-gray-400" size={64} />
+            <Brain className="mx-auto mb-4 text-gray-400" size={64} />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Access Restricted</h3>
-            <p className="text-gray-600">You don't have permission to view analytics</p>
+            <p className="text-gray-600">You don't have permission to view analytics.</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const isLoading = employeesLoading || tasksLoading || recognitionsLoading || logisticsLoading;
+  const isLoading = testsLoading || attemptsLoading;
 
   // Calculate metrics
-  const totalEmployees = employees?.length || 0;
-  const activeEmployees = employees?.filter((emp: Employee) => emp.user.status === 'active').length || 0;
-  const onboardingEmployees = employees?.filter((emp: Employee) => emp.user.status === 'onboarding').length || 0;
+  const totalTests = tests?.length || 0;
+  const activeTests = tests?.filter(test => test.isActive).length || 0;
+  const totalAttempts = attempts?.length || 0;
+  const completedAttempts = attempts?.filter(attempt => attempt.status === 'completed').length || 0;
+  const completionRate = totalAttempts > 0 ? Math.round((completedAttempts / totalAttempts) * 100) : 0;
   
-  const totalTasks = tasks?.length || 0;
-  const completedTasks = tasks?.filter((task: Task) => task.status === 'completed').length || 0;
-  const overdueTasks = tasks?.filter((task: Task) => task.status === 'overdue').length || 0;
-  const taskCompletionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const averageScore = completedAttempts > 0 
+    ? Math.round(attempts.filter(a => a.status === 'completed').reduce((sum, a) => sum + (a.percentageScore || 0), 0) / completedAttempts)
+    : 0;
 
-  const totalRecognitions = recognitions?.filter((rec: Recognition) => rec.isApproved).length || 0;
-  const thisMonthRecognitions = recognitions?.filter((rec: Recognition) => 
-    rec.isApproved && new Date(rec.createdAt).getMonth() === new Date().getMonth()
-  ).length || 0;
-
-  const pendingLogisticsRequests = logisticsRequests?.filter((req: LogisticsRequest) => req.status === 'pending').length || 0;
-
-  // Department breakdown
-  const departments = [...new Set(employees?.map((emp: Employee) => emp.user.department).filter(Boolean) || [])];
-  const departmentStats = departments.map(dept => ({
-    name: dept,
-    count: employees?.filter((emp: Employee) => emp.user.department === dept).length || 0,
-    percentage: totalEmployees > 0 ? Math.round((employees?.filter((emp: Employee) => emp.user.department === dept).length || 0) / totalEmployees * 100) : 0
+  // Test type breakdown
+  const testTypes = [...new Set(tests?.map(test => test.testType).filter(Boolean) || [])];
+  const testTypeStats = testTypes.map(type => ({
+    name: type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    count: tests?.filter(test => test.testType === type).length || 0,
+    attempts: attempts?.filter(attempt => {
+      const test = tests.find(t => t.id === attempt.testId);
+      return test?.testType === type;
+    }).length || 0,
+    avgScore: (() => {
+      const typeAttempts = attempts.filter(attempt => {
+        const test = tests.find(t => t.id === attempt.testId);
+        return test?.testType === type && attempt.status === 'completed';
+      });
+      return typeAttempts.length > 0 
+        ? Math.round(typeAttempts.reduce((sum, a) => sum + (a.percentageScore || 0), 0) / typeAttempts.length)
+        : 0;
+    })()
   }));
 
-  // Role distribution
-  const roleStats = [
-    { role: 'Employee', count: employees?.filter((emp: Employee) => emp.user.role === 'employee').length || 0 },
-    { role: 'Team Lead', count: employees?.filter((emp: Employee) => emp.user.role === 'team_lead').length || 0 },
-    { role: 'Manager', count: employees?.filter((emp: Employee) => emp.user.role === 'branch_manager').length || 0 },
-    { role: 'HR Admin', count: employees?.filter((emp: Employee) => emp.user.role === 'hr_admin').length || 0 },
-    { role: 'Logistics', count: employees?.filter((emp: Employee) => emp.user.role === 'logistics_manager').length || 0 },
-  ];
-
-  // Task priority breakdown
-  const taskPriorityStats = [
-    { priority: 'Low', count: tasks?.filter((task: Task) => task.priority === 'low').length || 0, color: 'bg-gray/10 text-gray-600' },
-    { priority: 'Medium', count: tasks?.filter((task: Task) => task.priority === 'medium').length || 0, color: 'bg-primary/10 text-primary' },
-    { priority: 'High', count: tasks?.filter((task: Task) => task.priority === 'high').length || 0, color: 'bg-warning/10 text-warning' },
-    { priority: 'Urgent', count: tasks?.filter((task: Task) => task.priority === 'urgent').length || 0, color: 'bg-destructive/10 text-destructive' },
+  // Score distribution
+  const scoreRanges = [
+    { range: 'Excellent (80-100%)', count: attempts?.filter(a => a.percentageScore >= 80).length || 0, color: 'bg-green/10 text-green-600' },
+    { range: 'Good (60-79%)', count: attempts?.filter(a => a.percentageScore >= 60 && a.percentageScore < 80).length || 0, color: 'bg-yellow/10 text-yellow-600' },
+    { range: 'Needs Improvement (0-59%)', count: attempts?.filter(a => a.percentageScore < 60).length || 0, color: 'bg-red/10 text-red-600' },
   ];
 
   const exportData = () => {
     const data = {
       timestamp: new Date().toISOString(),
-      timeRange,
-      department: departmentFilter || 'All',
       metrics: {
-        employees: { total: totalEmployees, active: activeEmployees, onboarding: onboardingEmployees },
-        tasks: { total: totalTasks, completed: completedTasks, overdue: overdueTasks, completionRate: taskCompletionRate },
-        recognitions: { total: totalRecognitions, thisMonth: thisMonthRecognitions },
-        logistics: { pendingRequests: pendingLogisticsRequests }
+        tests: { total: totalTests, active: activeTests },
+        attempts: { total: totalAttempts, completed: completedAttempts, completionRate },
+        performance: { averageScore }
       },
-      departmentBreakdown: departmentStats,
-      roleDistribution: roleStats,
-      taskPriorities: taskPriorityStats
+      testTypeBreakdown: testTypeStats,
+      scoreDistribution: scoreRanges
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `psychometric-analytics-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -142,42 +112,14 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Analytics & Reports</h2>
-          <p className="text-gray-600 mt-1">Track organizational metrics and performance</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Psychometric Testing Analytics</h2>
+          <p className="text-gray-600 mt-1">Comprehensive analysis of testing performance and candidate insights</p>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Time range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="quarter">This Quarter</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All Departments" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((dept) => (
-                <SelectItem key={dept} value={dept}>
-                  {dept}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button onClick={exportData} variant="outline">
-            <Download className="mr-2" size={16} />
-            Export Report
-          </Button>
-        </div>
+        <Button onClick={exportData} variant="outline">
+          <Download className="mr-2" size={16} />
+          Export Analytics
+        </Button>
       </div>
 
       {/* Key Metrics */}
@@ -186,14 +128,32 @@ export default function Analytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Total Employees</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalEmployees}</p>
+                <p className="text-gray-600 text-sm font-medium">Active Tests</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{activeTests}</p>
                 <p className="text-accent text-sm font-medium mt-2 flex items-center">
-                  <TrendingUp className="mr-1" size={12} />
-                  {activeEmployees} active
+                  <Brain className="mr-1" size={12} />
+                  {totalTests} total
                 </p>
               </div>
               <div className="stats-card-icon bg-primary/10 text-primary">
+                <Brain size={24} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="stats-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Test Completion</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{completionRate}%</p>
+                <p className="text-accent text-sm font-medium mt-2 flex items-center">
+                  <Target className="mr-1" size={12} />
+                  {completedAttempts} of {totalAttempts}
+                </p>
+              </div>
+              <div className="stats-card-icon bg-accent/10 text-accent">
                 <Users size={24} />
               </div>
             </div>
@@ -204,33 +164,15 @@ export default function Analytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Task Completion</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{taskCompletionRate}%</p>
-                <p className="text-accent text-sm font-medium mt-2 flex items-center">
-                  <CheckCircle className="mr-1" size={12} />
-                  {completedTasks} of {totalTasks}
-                </p>
-              </div>
-              <div className="stats-card-icon bg-accent/10 text-accent">
-                <Target size={24} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="stats-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Recognition Awards</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{totalRecognitions}</p>
+                <p className="text-gray-600 text-sm font-medium">Average Score</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{averageScore}%</p>
                 <p className="text-warning text-sm font-medium mt-2 flex items-center">
-                  <Award className="mr-1" size={12} />
-                  {thisMonthRecognitions} this month
+                  <BarChart3 className="mr-1" size={12} />
+                  Platform average
                 </p>
               </div>
               <div className="stats-card-icon bg-warning/10 text-warning">
-                <Award size={24} />
+                <BarChart3 size={24} />
               </div>
             </div>
           </CardContent>
@@ -240,15 +182,15 @@ export default function Analytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium">Pending Requests</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{pendingLogisticsRequests}</p>
+                <p className="text-gray-600 text-sm font-medium">High Performers</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{attempts?.filter(a => a.percentageScore >= 80).length || 0}</p>
                 <p className="text-gray-600 text-sm font-medium mt-2 flex items-center">
-                  <Clock className="mr-1" size={12} />
-                  Logistics items
+                  <Award className="mr-1" size={12} />
+                  80%+ scores
                 </p>
               </div>
               <div className="stats-card-icon bg-secondary/10 text-secondary">
-                <Clock size={24} />
+                <Award size={24} />
               </div>
             </div>
           </CardContent>
@@ -257,59 +199,59 @@ export default function Analytics() {
 
       {/* Charts and Breakdowns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Department Breakdown */}
+        {/* Test Type Breakdown */}
         <Card className="stats-card">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-              <PieChart className="mr-2" size={20} />
-              Department Distribution
+              <Brain className="mr-2" size={20} />
+              Test Type Performance
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <div key={i} className="animate-pulse">
                     <div className="h-8 bg-gray-200 rounded"></div>
                   </div>
                 ))}
               </div>
-            ) : departmentStats.length > 0 ? (
+            ) : testTypeStats.length > 0 ? (
               <div className="space-y-4">
-                {departmentStats.map((dept, index) => (
-                  <div key={dept.name} className="space-y-2">
+                {testTypeStats.map((testType, index) => (
+                  <div key={testType.name} className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-900">{dept.name}</span>
+                      <span className="text-sm font-medium text-gray-900">{testType.name}</span>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">{dept.count}</span>
-                        <Badge variant="outline">{dept.percentage}%</Badge>
+                        <span className="text-sm text-gray-600">{testType.attempts} attempts</span>
+                        <Badge variant="outline">{testType.avgScore}% avg</Badge>
                       </div>
                     </div>
-                    <Progress value={dept.percentage} className="h-2" />
+                    <Progress value={testType.avgScore} className="h-2" />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <PieChart className="mx-auto mb-4 text-gray-400" size={48} />
-                <p>No department data available</p>
+                <Brain className="mx-auto mb-4 text-gray-400" size={48} />
+                <p>No test data available</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Role Distribution */}
+        {/* Score Distribution */}
         <Card className="stats-card">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-              <Users className="mr-2" size={20} />
-              Role Distribution
+              <Target className="mr-2" size={20} />
+              Score Distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <div key={i} className="animate-pulse">
                     <div className="h-8 bg-gray-200 rounded"></div>
                   </div>
@@ -317,108 +259,13 @@ export default function Analytics() {
               </div>
             ) : (
               <div className="space-y-4">
-                {roleStats.map((role, index) => (
-                  <div key={role.role} className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-900">{role.role}</span>
+                {scoreRanges.map((range, index) => (
+                  <div key={range.range} className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-900">{range.range}</span>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600">{role.count}</span>
-                      <Badge variant="outline">
-                        {totalEmployees > 0 ? Math.round((role.count / totalEmployees) * 100) : 0}%
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Task Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Task Status Overview */}
-        <Card className="stats-card">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-              <BarChart3 className="mr-2" size={20} />
-              Task Status Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Completed</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div className="bg-accent h-2 rounded-full progress-fill" style={{ width: `${taskCompletionRate}%` }}></div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{taskCompletionRate}%</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">In Progress</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div className="bg-warning h-2 rounded-full progress-fill" style={{ width: `${totalTasks > 0 ? Math.round((tasks?.filter((task: Task) => task.status === 'in_progress').length || 0) / totalTasks * 100) : 0}%` }}></div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {totalTasks > 0 ? Math.round((tasks?.filter((task: Task) => task.status === 'in_progress').length || 0) / totalTasks * 100) : 0}%
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Overdue</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-2">
-                      <div className="bg-destructive h-2 rounded-full progress-fill" style={{ width: `${totalTasks > 0 ? Math.round((overdueTasks / totalTasks) * 100) : 0}%` }}></div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {totalTasks > 0 ? Math.round((overdueTasks / totalTasks) * 100) : 0}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Task Priority Breakdown */}
-        <Card className="stats-card">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-              <Target className="mr-2" size={20} />
-              Task Priority Breakdown
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded"></div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {taskPriorityStats.map((priority) => (
-                  <div key={priority.priority} className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-900">{priority.priority}</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600">{priority.count}</span>
-                      <Badge className={priority.color}>
-                        {totalTasks > 0 ? Math.round((priority.count / totalTasks) * 100) : 0}%
+                      <span className="text-sm text-gray-600">{range.count}</span>
+                      <Badge className={range.color}>
+                        {completedAttempts > 0 ? Math.round((range.count / completedAttempts) * 100) : 0}%
                       </Badge>
                     </div>
                   </div>
@@ -440,25 +287,25 @@ export default function Analytics() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-accent mb-2">{taskCompletionRate}%</div>
-              <p className="text-sm text-gray-600">Task Completion Rate</p>
-              <p className="text-xs text-gray-500 mt-1">Above 85% is excellent</p>
+              <div className="text-3xl font-bold text-accent mb-2">{completionRate}%</div>
+              <p className="text-sm text-gray-600">Test Completion Rate</p>
+              <p className="text-xs text-gray-500 mt-1">Candidates who finish tests</p>
             </div>
             
             <div className="text-center">
               <div className="text-3xl font-bold text-primary mb-2">
-                {totalEmployees > 0 ? Math.round((activeEmployees / totalEmployees) * 100) : 0}%
+                {averageScore}%
               </div>
-              <p className="text-sm text-gray-600">Employee Retention</p>
-              <p className="text-xs text-gray-500 mt-1">Active vs Total</p>
+              <p className="text-sm text-gray-600">Average Test Score</p>
+              <p className="text-xs text-gray-500 mt-1">Across all completed tests</p>
             </div>
             
             <div className="text-center">
               <div className="text-3xl font-bold text-warning mb-2">
-                {totalEmployees > 0 ? Math.round((thisMonthRecognitions / totalEmployees) * 100) : 0}%
+                {completedAttempts > 0 ? Math.round((attempts?.filter(a => a.percentageScore >= 80).length || 0) / completedAttempts * 100) : 0}%
               </div>
-              <p className="text-sm text-gray-600">Recognition Rate</p>
-              <p className="text-xs text-gray-500 mt-1">This month</p>
+              <p className="text-sm text-gray-600">Excellence Rate</p>
+              <p className="text-xs text-gray-500 mt-1">Candidates scoring 80%+</p>
             </div>
           </div>
         </CardContent>

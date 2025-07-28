@@ -1,38 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserPlus, ListTodo, Award, Boxes, BarChart3, Shield, Clock } from "lucide-react";
+import { Brain, BarChart3, Users, FileText, Award, Shield, Clock, Target } from "lucide-react";
 
 export default function Landing() {
   const features = [
     {
-      icon: Users,
-      title: "Employee Management",
-      description: "Comprehensive employee directory with role-based access control"
-    },
-    {
-      icon: UserPlus,
-      title: "Smart Onboarding",
-      description: "Streamlined onboarding process with automated checklists"
-    },
-    {
-      icon: ListTodo,
-      title: "Task Management",
-      description: "Efficient task assignment and tracking system"
-    },
-    {
-      icon: Award,
-      title: "Recognition System",
-      description: "Employee recognition and achievement tracking"
-    },
-    {
-      icon: Boxes,
-      title: "Logistics Management",
-      description: "Inventory and equipment management made simple"
+      icon: Brain,
+      title: "Psychometric Assessments",
+      description: "Comprehensive personality, cognitive, and emotional intelligence testing"
     },
     {
       icon: BarChart3,
-      title: "Analytics & Reports",
-      description: "Comprehensive analytics and reporting dashboard"
+      title: "Advanced Analytics",
+      description: "Detailed scoring, trait analysis, and comprehensive reporting"
+    },
+    {
+      icon: Users,
+      title: "Candidate Management",
+      description: "Track test attempts, manage candidates, and review results"
+    },
+    {
+      icon: Award,
+      title: "Professional Reports",
+      description: "Generate detailed PDF reports with insights and recommendations"
+    },
+    {
+      icon: FileText,
+      title: "Multiple Test Types",
+      description: "Personality, cognitive aptitude, emotional intelligence, and integrity tests"
+    },
+    {
+      icon: Target,
+      title: "Hiring Insights",
+      description: "Data-driven hiring recommendations and candidate evaluation"
     },
     {
       icon: Shield,
@@ -56,8 +56,8 @@ export default function Landing() {
               <Users className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Meeting Matters</h1>
-              <p className="text-sm text-gray-600">HR Management System</p>
+              <h1 className="text-xl font-bold text-gray-900">PsychoTest Pro</h1>
+              <p className="text-sm text-gray-600">Psychometric Testing Platform</p>
             </div>
           </div>
           <Button onClick={() => window.location.href = '/api/login'} className="btn-primary">
@@ -70,13 +70,13 @@ export default function Landing() {
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Streamline Your HR Operations with
-            <span className="text-primary"> Meeting Matters</span>
+            Advanced Psychometric Testing for
+            <span className="text-primary"> Better Hiring Decisions</span>
           </h2>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            A comprehensive HR management system designed for modern organizations. 
-            Manage employees, streamline onboarding, track tasks, and boost productivity 
-            with role-based access control and real-time insights.
+            A comprehensive psychometric testing platform designed for modern recruitment. 
+            Assess personality traits, cognitive abilities, emotional intelligence, and integrity 
+            with scientifically validated tests and detailed analytics.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
@@ -96,10 +96,10 @@ export default function Landing() {
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h3 className="text-3xl font-bold text-gray-900 mb-4">
-            Everything You Need for HR Management
+            Everything You Need for Psychometric Assessment
           </h3>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Powerful features designed to simplify your HR processes and enhance employee experience
+            Powerful features designed to enhance your recruitment process with data-driven insights
           </p>
         </div>
         
@@ -127,20 +127,20 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              Built for Every Role in Your Organization
+              Built for Modern Recruitment Teams
             </h3>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Tailored experiences for different user roles with appropriate access levels
+              Tailored experiences for HR professionals, recruiters, and hiring managers
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
             {[
-              { role: "HR Admin", description: "Complete system access and management", color: "bg-primary" },
-              { role: "Branch Manager", description: "Department oversight and reporting", color: "bg-accent" },
-              { role: "Team Lead", description: "Team management and task assignment", color: "bg-warning" },
-              { role: "Employee", description: "Personal dashboard and task management", color: "bg-secondary" },
-              { role: "Logistics Manager", description: "Inventory and equipment management", color: "bg-destructive" }
+              { role: "HR Administrator", description: "Complete platform management and analytics", color: "bg-primary" },
+              { role: "Recruiter", description: "Candidate assessment and result review", color: "bg-accent" },
+              { role: "Hiring Manager", description: "Team-specific hiring insights", color: "bg-warning" },
+              { role: "Test Candidate", description: "Seamless test-taking experience", color: "bg-secondary" },
+              { role: "System Admin", description: "Platform configuration and maintenance", color: "bg-destructive" }
             ].map((role, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -162,10 +162,10 @@ export default function Landing() {
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold text-gray-900 mb-6">
-            Ready to Transform Your HR Operations?
+            Ready to Transform Your Hiring Process?
           </h3>
           <p className="text-lg text-gray-600 mb-8">
-            Join organizations that trust Meeting Matters for their HR management needs
+            Join organizations that trust PsychoTest Pro for data-driven hiring decisions
           </p>
           <Button 
             onClick={() => window.location.href = '/api/login'} 
@@ -182,15 +182,15 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Users className="text-white" size={20} />
+                <Brain className="text-white" size={20} />
               </div>
               <div>
-                <h4 className="font-bold">Meeting Matters</h4>
-                <p className="text-sm text-gray-400">HR Management System</p>
+                <h4 className="font-bold">PsychoTest Pro</h4>
+                <p className="text-sm text-gray-400">Psychometric Testing Platform</p>
               </div>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-gray-400">© 2024 Meeting Matters. All rights reserved.</p>
+              <p className="text-gray-400">© 2024 PsychoTest Pro. All rights reserved.</p>
             </div>
           </div>
         </div>
